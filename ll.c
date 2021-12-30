@@ -24,8 +24,8 @@ ll_load_t *new_ll_load(void *payload) {
 	new_ll->print = NULL;
 	new_ll->destroy = NULL;
 
-	new_ll->next = NULL;
-	new_ll->prev = NULL;
+	new_ll->next = new_ll;
+	new_ll->prev = new_ll;
 
 	return new_ll;
 }
@@ -93,6 +93,10 @@ int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 	// check for insertion as head (for weighted insertion)
 	// for normal list weight should return true
 	if (ll_p->weight && ll_p->direction && ll_p->weight(payload, curr_ll_load->payload)) {
+		// maintain double linkage
+		curr_ll_load->prev->next = new_ll;
+		new_ll->prev = curr_ll_load->prev;
+
 		// splice in the new_ll as the head of the list
 		// normal insertion
 		ll_p->head->prev = new_ll;
@@ -102,6 +106,10 @@ int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 		return 0;
 	// for reverse, the weight should return false
 	} else if (ll_p->weight && !ll_p->direction && !ll_p->weight(payload, curr_ll_load->payload)) {
+		// maintain double linkage
+		curr_ll_load->next->prev = new_ll;
+		new_ll->next = curr_ll_load->next;
+
 		// reverse the ordering of "prev" and "next"
 		ll_p->head->next = new_ll;
 		ll_p->head = new_ll;
@@ -127,6 +135,10 @@ int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 	// splice in as curr_ll_load->next for normal nexting
 	// if there is already a value at next, need to correct that value to
 	// point at this new_ll
+
+	// FOR THE DOUBLY LINKED:
+	// if new_ll is the last item in the list (either front or back),
+	// connect back to the head of the list
 	if (ll_p->direction) {
 		if (curr_ll_load->next) {
 			curr_ll_load->next->prev = new_ll;
@@ -135,6 +147,11 @@ int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 
 		curr_ll_load->next = new_ll;
 		new_ll->prev = curr_ll_load;
+
+		if (!new_ll->next) {
+			new_ll->next = ll_p->head;
+			ll_p->head->prev = new_ll;
+		}
 	} else {
 		if (curr_ll_load->prev) {
 			curr_ll_load->prev->next = new_ll;
@@ -143,6 +160,11 @@ int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 
 		curr_ll_load->prev = new_ll;
 		new_ll->next = curr_ll_load;
+
+		if (!new_ll->prev) {
+			new_ll->prev = ll_p->head;
+			ll_p->head->next = new_ll;
+		}
 	}
 
 	return 0;
@@ -164,17 +186,22 @@ void *popheadLL(ll_t *ll_p) {
 	// get next (if exists)
 	ll_load_t *next = ll_p->direction ? ll_p->head->next : ll_p->head->prev;
 
+	if (next != ll_p->head)
+		if (ll_p->direction) {
+			next->prev = ll_p->head->prev;
+			ll_p->head->prev->next = next;
+		} else {
+			next->next = ll_p->head->next;
+			ll_p->head->next->prev = next;
+		}
+	else
+		next = NULL;
+
 	// delete current head
 	free(ll_p->head);
 
 	// update head
 	ll_p->head = next;
-
-	// ensure next->next or next->prev points to NULL
-	if (ll_p->direction)
-		ll_p->head->prev = NULL;
-	else
-		ll_p->head->next = NULL;
 
 	return payload;
 }
@@ -188,13 +215,8 @@ int reverseLL(ll_t *ll_p) {
 	if (!curr) // empty list
 		return 0;
 
-	// normal search for tail
-	while (ll_p->direction && curr->next)
-		curr = curr->next;
-
-	// reverse search for tail
-	while (!ll_p->direction && curr->prev)
-		curr = curr->prev;
+	// grab tail
+	curr = ll_p->direction ? curr->prev : curr->next;
 
 	// update head from wherever curr ended
 	ll_p->head = curr;
