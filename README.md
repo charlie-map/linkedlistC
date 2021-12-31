@@ -53,15 +53,36 @@ The order does not matter for either parameter as long as each matches with the 
 *Please post issues for more features that should be considered*
 
 # peek at linked list
+Peeking is the process of looking at the head of the linked list. If combined with the weight feature, this can easily be utilized as a priority queue. The peek returns a `void *` pointer to whatever memory is at the head position, and van be called with the folloinwg:
 
+```C
+void *payload = peakheadLL(ll_head);
+```
 
 # pop off linked list
+Popping works similarly to peaking, but the pop removes the pointer from the linked list and updates the head pointer. This function returns the pointer to the payload.
 
+```C
+void *payload = popheadLL(ll_head);
+```
 
 # reverse linked list
+This reverses the linked list. However, the reverse utilizes the doubly linked reature in this linked list to provide constant time reversing. All that occurs to reverse the list is the head points to the value one to the left of the curr head (which is the same as looping to the end of the linked list), and then reverses the direction of the list. The following shows an example of reversing the linked list. **Note** that with a weighted list, the weight will function in the reverse of before, so items will still correctly find positions in the linked list.
 
+```C
+reverseLL(ll_head);
+```
 
 # print linked list
+Print loops through each value in the linked list and tries to print them. The value at a certain pointer will only be printed if the `p` parameter was used during the [insertion](#insert-into-linked-list) of that value. Otherwise, nothing will print.
 
+```C
+printLL(ll_head);
+```
 
 # destroy linked list
+Destruction frees the linked list head pointer and all pointers allocated during [insertion](#insert-into-linked-list). The `void *payload` at a given value in the list can also be `free()`d if the `d` parameter was used during the insertion of said value.
+
+```C
+destroyLL(ll_head);
+```
