@@ -87,7 +87,7 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 	// no head, add as head
 	if (!curr_ll_load) {
 		ll_p->head = new_ll;
-		return 0;
+		return new_ll;
 	}
 
 	// check for insertion as head (for weighted insertion)
@@ -103,7 +103,7 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 		ll_p->head = new_ll;
 		new_ll->next = curr_ll_load;
 
-		return 0;
+		return new_ll;
 	// for reverse, the weight should return false
 	} else if (ll_p->weight && !ll_p->direction && !ll_p->weight(payload, curr_ll_load->payload)) {
 		// maintain double linkage
@@ -115,21 +115,21 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 		ll_p->head = new_ll;
 		new_ll->prev = curr_ll_load;
 
-		return 0;
+		return new_ll;
 	}
 
 	// find position in linked list normal nexting
-	while (ll_p->direction && curr_ll_load->next && (!ll_p->weight || !ll_p->weight(payload, curr_ll_load->payload)))
+	while (ll_p->direction && curr_ll_load->next != ll_p->head && (!ll_p->weight || !ll_p->weight(payload, curr_ll_load->payload)))
 		curr_ll_load = curr_ll_load->next;
 
 	// find position in linked list reverse nexting
-	while (!ll_p->direction && curr_ll_load->prev && (!ll_p->weight || ll_p->weight(payload, curr_ll_load->payload)))
+	while (!ll_p->direction && curr_ll_load->prev != ll_p->head && (!ll_p->weight || ll_p->weight(payload, curr_ll_load->payload)))
 		curr_ll_load = curr_ll_load->prev;
 
 	// if the placement is due to weight, curr_ll_load needs to move over by 1
-	if (ll_p->direction && curr_ll_load->next)
+	if (ll_p->direction && curr_ll_load->next != ll_p->head)
 		curr_ll_load = curr_ll_load->prev;
-	else if (!ll_p->direction && curr_ll_load->prev)
+	else if (!ll_p->direction && curr_ll_load->prev != ll_p->head)
 		curr_ll_load = curr_ll_load->next;
 
 	// splice in as curr_ll_load->next for normal nexting
@@ -140,7 +140,7 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 	// if new_ll is the last item in the list (either front or back),
 	// connect back to the head of the list
 	if (ll_p->direction) {
-		if (curr_ll_load->next) {
+		if (curr_ll_load->next != ll_p->head) {
 			curr_ll_load->next->prev = new_ll;
 			new_ll->next = curr_ll_load->next;
 		}
@@ -148,12 +148,12 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 		curr_ll_load->next = new_ll;
 		new_ll->prev = curr_ll_load;
 
-		if (!new_ll->next) {
+		if (new_ll->next == new_ll) {
 			new_ll->next = ll_p->head;
 			ll_p->head->prev = new_ll;
 		}
 	} else {
-		if (curr_ll_load->prev) {
+		if (curr_ll_load->prev != ll_p->head) {
 			curr_ll_load->prev->next = new_ll;
 			new_ll->prev = curr_ll_load->prev;
 		}
@@ -161,7 +161,7 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 		curr_ll_load->prev = new_ll;
 		new_ll->next = curr_ll_load;
 
-		if (!new_ll->prev) {
+		if (new_ll->prev == new_ll) {
 			new_ll->prev = ll_p->head;
 			ll_p->head->next = new_ll;
 		}
@@ -204,6 +204,10 @@ void *popheadLL(ll_t *ll_p) {
 	ll_p->head = next;
 
 	return payload;
+}
+
+void *getpayloadLL(void *ll_load) {
+	return ((ll_load_t *) ll_load)->payload;
 }
 
 void *nextLL(ll_t *ll_p, void *ll_load) {
@@ -257,7 +261,7 @@ int destroyLL(ll_t *ll_p) {
 	ll_load_t *curr = ll_p->head;
 
 	// loop through each link and destroy
-	while (curr) {
+	do {
 		// check for existence of destroy
 		if (curr->destroy)
 			curr->destroy(curr->payload);
@@ -268,7 +272,7 @@ int destroyLL(ll_t *ll_p) {
 		free(curr);
 
 		curr = next;
-	}
+	} while (curr != ll_p->head);
 
 	free(ll_p);
 	ll_p = NULL;

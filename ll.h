@@ -10,7 +10,8 @@ void *insertLL(ll_t *ll_p, void *payload, char *param, ...);
 void *peekheadLL(ll_t *ll_p);
 void *popheadLL(ll_t *ll_p);
 
-void *nextLL(void *ll_p)
+void *nextLL(ll_t *ll_p, void *ll_load);
+void *getpayloadLL(void *ll_p);
 int reverseLL(ll_t *ll_p);
 
 int printLL(ll_t *ll_p);

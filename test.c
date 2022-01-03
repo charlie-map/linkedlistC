@@ -29,16 +29,19 @@ int test() {
 
 	// some simple int * tests with no print or destroy
 	int test1 = 50;
-	insertLL(ll_1, &test1, "");
+	void *ll_ptr1 = insertLL(ll_1, &test1, "");
 	int test2 = 500;
-	insertLL(ll_1, &test2, "");
+	void *ll_ptr2 = insertLL(ll_1, &test2, "");
 	int test3 = 750;
-	insertLL(ll_1, &test3, "");
+	void *ll_ptr3 = insertLL(ll_1, &test3, "");
 
+	assert(*(int *) getpayloadLL(ll_ptr1) == 50);
 	assert(*(int *) peekheadLL(ll_1) == 50);
 	// reverse
 	reverseLL(ll_1);
 	assert(*(int *) peekheadLL(ll_1) == 750);
+	assert(*(int *) getpayloadLL(ll_ptr3) == 750);
+	assert(getpayloadLL(nextLL(ll_1, ll_ptr3)) == getpayloadLL(ll_ptr2));
 	assert(*(int *) popheadLL(ll_1) == 750);
 
 	// malloced value with a destroy function

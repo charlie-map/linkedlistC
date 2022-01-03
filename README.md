@@ -8,9 +8,11 @@ The following functions are the core components of this implementation:
 2. [Linked List Insertion - `insertLL()`](#insert-into-linked-list)
 3. [Linked List Peek - `peakheadLL()`](#peek-at-linked-list)
 4. [Linked List Pop - `popheadLL()`](#pop-off-linked-list)
-5. [Linked List Reverse - `reverseLL()`](#reverse-linked-list)
-6. [Linked List Print - `printLL()`](#print-linked-list)
-7. [Linked List Destroy - `destroyLL()`](#destroy-linked-list)
+6. [Linked List Peek Next - `nextLL()`](#peek-next-in-linked-list)
+7. [Linked List Get Payload - `getpayloadLL()`](#get-payload-from-linked-list)
+8. [Linked List Reverse - `reverseLL()`](#reverse-linked-list)
+9. [Linked List Print - `printLL()`](#print-linked-list)
+10. [Linked List Destroy - `destroyLL()`](#destroy-linked-list)
 
 # create linked list
 Creating a linked list is relatively straightforward. Declare an `ll_t *` variable and then use the function `makeLL()` to have a linked list pointer created for you. There are some optional parameters you can use if you wish for certain features.
@@ -35,7 +37,7 @@ The first element for this function is always the payload that is being inputted
 Insertion will take a pointer to the head of a linked list and a `void *` payload. The third parameter works similarly to the previously mentioned strategy in [creation](#create-linked-list). A normal insertion (for either weighted or unweighted) would look like:
 
 ```C
-insertLL(ll_head, (void *) somePayload, "");
+void *ll_ptr = insertLL(ll_head, (void *) somePayload, "");
 ```
 
 Additional function features include:
@@ -45,10 +47,14 @@ Additional function features include:
 Using a single one of these features would look the same as the linked list creation, however using both (like `printf`) assumes that the functions are inputted in the same order as the character in the `char *param`. Using both would look like:
 
 ```C
-insertLL(ll_head, (void *) somePayload, "pd", printSomePayload, destroySomePayload);
+void *ll_ptr = insertLL(ll_head, (void *) somePayload, "pd", printSomePayload, destroySomePayload);
 ```
 
-The order does not matter for either parameter as long as each matches with the character order in the `char *param`
+The order does not matter for either parameter as long as each matches with the character order in the `char *param`.
+
+## updates
+- `insertLL()` now returns a `void *` pointer to the linked list element that was just inserted. The `void *ll_ptr` can be used for the following function:
+    - [`nextLL()`](#peek-next-in-linked-list)
 
 *Please post issues for more features that should be considered*
 
@@ -64,6 +70,22 @@ Popping works similarly to peaking, but the pop removes the pointer from the lin
 
 ```C
 void *payload = popheadLL(ll_head);
+```
+
+# peek next in linked list
+The takes in a `void *` (see pointer returned fron [`insertLL()`](#insert-into-linked-list)) and will return a `void *` pointer the the next element in the linked list (which will work for either a reverse or a normal linked list). The below example shows a simple creation of a `void *` to the next element in the linked list:
+
+```C
+void *ll_next = nextLL(ll_head, ll_ptr);
+```
+
+Use the following function to look at the payload within the `void *`.
+
+# get payload from linked list
+This function works in conjunction with [`nextLL()`](#peek-next-in-linked-list) to get the payload from a `void *` pointer to a linked list element. This returns a `void *` pointer to the payload, which will be in the structure of the pointer inserted into the linked list. This will look similar to the [`peekLL()`](#peek-at-linked-list) functionality:
+
+```C
+void *payload = getpayloadLL(ll_ptr);
 ```
 
 # reverse linked list
