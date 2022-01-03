@@ -63,7 +63,7 @@ ll_t *makeLL(char *param, ...) {
 	return new_ll_p;
 }
 
-int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
+void *insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 	ll_load_t *new_ll = new_ll_load(payload);
 
 	va_list extra_input;
@@ -167,7 +167,7 @@ int insertLL(ll_t *ll_p, void *payload, char *param, ...) {
 		}
 	}
 
-	return 0;
+	return new_ll;
 }
 
 // returns the payload at the head of the list
@@ -204,6 +204,13 @@ void *popheadLL(ll_t *ll_p) {
 	ll_p->head = next;
 
 	return payload;
+}
+
+void *nextLL(ll_t *ll_p, void *ll_load) {
+	if (ll_p->direction)
+		return ((ll_load_t *) ll_load)->next;
+	else
+		return ((ll_load_t *) ll_load)->prev;
 }
 
 // because the linked list is doubly linked,
