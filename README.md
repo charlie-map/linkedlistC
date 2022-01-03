@@ -53,8 +53,9 @@ void *ll_ptr = insertLL(ll_head, (void *) somePayload, "pd", printSomePayload, d
 The order does not matter for either parameter as long as each matches with the character order in the `char *param`.
 
 ## updates
-- `insertLL()` now returns a `void *` pointer to the linked list element that was just inserted. The `void *ll_ptr` can be used for the following function:
+- `insertLL()` now returns a `void *` pointer to the linked list element that was just inserted. The `void *ll_ptr` can be used for the following functions:
     - [`nextLL()`](#peek-next-in-linked-list)
+    - [`getpayload()`](#get-payload-from-linked-list)
 
 *Please post issues for more features that should be considered*
 
